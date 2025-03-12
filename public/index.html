@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>☕ Seattle Work Get-Together ☕</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #003d5b;
+            /* Seattle blue */
+            color: #ffffff;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+            background-image: url('https://images.unsplash.com/photo-1502175353174-a7a70e73b362?w=1200&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #036635;
+            /* Emerald City green */
+            text-shadow: 1px 1px #0b0b0b;
+            font-size: 2.2rem;
+        }
+
+        .poll-section {
+            background-color: #9bc4bc;
+            /* Soft teal */
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .poll-section::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23003d5b'%3E%3Cpath d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'/%3E%3C/svg%3E");
+            opacity: 0.7;
+        }
+
+        input[type="text"],
+        button {
+            font-family: inherit;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        input[type="text"] {
+            background-color: #f5f5f5;
+            border: 2px solid #003d5b;
+        }
+
+        button {
+            background-color: #036635;
+            /* Emerald City green */
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #00875f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .option-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem;
+            background: #ffffff;
+            border-radius: 10px;
+            margin: 0.5rem 0;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        footer {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            grid-column: span 7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #003d5b;
+        }
+
+        .calendar-day {
+            padding: 10px;
+            text-align: center;
+            background: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-day:hover {
+            background-color: #d1e8e2;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.selected {
+            background-color: #036635;
+            color: white;
+        }
+
+        .calendar-day.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .day-label {
+            grid-column: span 1;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #003d5b;
+        }
+
+        .selected-dates {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            text-align: left;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-section {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .results-section::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23003d5b'%3E%3Cpath d='M18.375 2.25c-1.035 0-1.875.84-1.875 1.875v15.75c0 1.035.84 1.875 1.875 1.875h.75c1.035 0 1.875-.84 1.875-1.875V4.125c0-1.036-.84-1.875-1.875-1.875h-.75zM9.75 8.625c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-.75c-1.036 0-1.875-.84-1.875-1.875V8.625zM3 13.125c0-1.036.84-1.875 1.875-1.875h.75c1.036 0 1.875.84 1.875 1.875v6.75c0 1.035-.84 1.875-1.875 1.875h-.75C3.84 21.75 3 20.91 3 19.875v-6.75z'/%3E%3C/svg%3E");
+            opacity: 0.7;
+        }
+
+        .user-vote {
+            background: #edf5f3;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .user-vote:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .delete-vote {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #c8102e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-vote:hover .delete-vote {
+            opacity: 1;
+        }
+
+        .delete-vote:hover {
+            transform: scale(1.1);
+            background-color: #e03a3e;
+        }
+
+        /* Delete user section */
+        .delete-user-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 10px;
+            border: 1px dashed #ccc;
+        }
+
+        .delete-user-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .delete-user-btn {
+            background-color: #c8102e;
+            transition: all 0.2s ease;
+        }
+
+        .delete-user-btn:hover {
+            background-color: #e03a3e;
+        }
+
+        .date-chip {
+            display: inline-block;
+            background: #003d5b;
+            color: white;
+            padding: 4px 10px;
+            margin: 3px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .seattle-icons {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+        }
+
+        .seattle-icon {
+            width: 70px;
+            height: 70px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.8;
+        }
+
+        .needle {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23003d5b'%3E%3Cpath d='M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z'/%3E%3C/svg%3E");
+        }
+
+        .coffee {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23003d5b'%3E%3Cpath d='M2 21v-2h18v2H2zM6 7v8c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM4 5v10c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V7c0-1.11-.89-2-2-2H4z'/%3E%3C/svg%3E");
+        }
+
+        .mountain {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23003d5b'%3E%3Cpath d='M14 6l-3.75 5 2.85 3.8-1.6 1.2L7 10l-6 8h22L14 6z'/%3E%3C/svg%3E");
+        }
+
+        .ferry {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23003d5b'%3E%3Cpath d='M6 6h12v3.5H6V6zm13.5 9.25c-1.5 0-2.5 1-2.5 1s-1-1-2.5-1-2.5 1-2.5 1-1-1-2.5-1-2.5 1-2.5 1-1-1-2.5-1c-.95 0-1.69.46-2.06.78L3.9 16H20l.77-1.07c-.27-.24-.97-.68-1.77-.68zM22 20.5h-20c0-1.24.69-2.91 2-3.64v-5.86h16v5.86c1.31.73 2 2.4 2 3.64z'/%3E%3C/svg%3E");
+        }
+
+        .popular-date {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            margin: 5px 0;
+            background: #edf5f3;
+            border-radius: 8px;
+        }
+
+        .popular-date .count {
+            background: #003d5b;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .header-image {
+            width: 100%;
+            height: 200px;
+            background-image: url('https://images.unsplash.com/photo-1538097304804-2a1b932466a9?w=1200&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* Add an overlay for better text readability if needed */
+        .header-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+            border-radius: 10px 10px 0 0;
+        }
+
+        h2 {
+            color: #003d5b;
+            border-bottom: 2px solid #9bc4bc;
+            padding-bottom: 8px;
+            margin-top: 25px;
+        }
+
+        #currentMonth {
+            font-size: 1.3rem;
+            color: #036635;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-image"></div>
+        <h1>☕ Seattle Work Get-Together ☕</h1>
+        <p>Join our team for a memorable gathering in the Emerald City this April! From Pike Place Market to
+            breathtaking views of Mt. Rainier, let's find the perfect day for everyone.</p>
+
+        <div class="seattle-icons">
+            <div class="seattle-icon needle" title="Space Needle"></div>
+            <div class="seattle-icon coffee" title="Coffee"></div>
+            <div class="seattle-icon mountain" title="Mt. Rainier"></div>
+            <div class="seattle-icon ferry" title="Ferry"></div>
+        </div>
+
+        <div class="poll-section">
+            <h2>🗓️ Find Your Perfect Seattle Day 🗓️</h2>
+
+            <div>
+                <label for="userName">Your Name:</label>
+                <input type="text" id="userName" placeholder="Enter your name" required>
+            </div>
+
+            <div class="calendar-header">
+                <button id="prevMonth">Previous</button>
+                <h3 id="currentMonth">April 2025</h3>
+                <button id="nextMonth">Next</button>
+            </div>
+
+            <div class="calendar" id="calendarContainer">
+                <!-- Calendar will be generated here -->
+            </div>
+
+            <div class="selected-dates" id="selectedDates">
+                <h3>Your Selected Dates:</h3>
+                <p id="noDatesSelected">No dates selected yet. Pick days when you're free to explore the city!</p>
+                <div id="datesList"></div>
+            </div>
+
+            <button id="submitDates">Submit My Available Dates</button>
+        </div>
+
+        <div class="results-section">
+            <h2>📊 Team Availability 📊</h2>
+            <div id="pollResults"></div>
+
+            <div class="delete-user-section">
+                <h3>Remove Your Dates</h3>
+                <p>If you need to remove your availability information, enter your name below.</p>
+                <div class="delete-user-container">
+                    <input type="text" id="deleteUserName" placeholder="Enter your name">
+                    <button id="deleteUserBtn" class="delete-user-btn">Remove My Dates</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            "The Emerald City awaits our team gathering!"<br>
+            <small>Photos from Unsplash. Icons representing Seattle landmarks and culture.</small>
+        </footer>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on('pollUpdated', fetchAndRenderPoll);
+
+        let selectedDates = [];
+        let currentDate = new Date();
+        // Set to April of current year + 1
+        currentDate.setFullYear(new Date().getFullYear() + 1);
+        currentDate.setMonth(3); // April (0-indexed)
+
+        // Initialize calendar
+        function initCalendar() {
+            renderCalendar();
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+            document.getElementById('submitDates').addEventListener('click', submitUserDates);
+        }
+
+        // Render calendar for current month
+        function renderCalendar() {
+            const calendarContainer = document.getElementById('calendarContainer');
+            calendarContainer.innerHTML = '';
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            // Update header
+            document.getElementById('currentMonth').textContent =
+                new Date(year, month, 1).toLocaleDateString('default', { month: 'long', year: 'numeric' });
+
+            // Add day labels
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const dayLabel = document.createElement('div');
+                dayLabel.className = 'day-label';
+                dayLabel.textContent = day;
+                calendarContainer.appendChild(dayLabel);
+            });
+
+            // Get first day of month and total days
+            const firstDay = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            // Add empty cells for days before first day of month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day disabled';
+                calendarContainer.appendChild(emptyDay);
+            }
+
+            // Add days of month
+            for (let i = 1; i <= totalDays; i++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'calendar-day';
+                dayCell.textContent = i;
+
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+
+                // Check if this date is already selected
+                if (selectedDates.includes(dateStr)) {
+                    dayCell.classList.add('selected');
+                }
+
+                // Add a special tooltip for certain Seattle events in April
+                if (month === 3) { // April
+                    if (i === 5) {
+                        dayCell.title = "Cherry Blossom Festival at UW";
+                    } else if (i === 12) {
+                        dayCell.title = "Tulip Festival in Skagit Valley";
+                    } else if (i === 19) {
+                        dayCell.title = "Earth Day celebrations at Seattle Center";
+                    } else if (i === 22) {
+                        dayCell.title = "Earth Day";
+                    } else if (i === 26) {
+                        dayCell.title = "Moisture Festival - Comedy/Varietè";
+                    }
+                }
+
+                dayCell.setAttribute('data-date', dateStr);
+                dayCell.addEventListener('click', toggleDateSelection);
+                calendarContainer.appendChild(dayCell);
+            }
+        }
+
+        // Toggle date selection
+        function toggleDateSelection(e) {
+            const dateStr = e.target.getAttribute('data-date');
+            const index = selectedDates.indexOf(dateStr);
+
+            if (index === -1) {
+                selectedDates.push(dateStr);
+                e.target.classList.add('selected');
+            } else {
+                selectedDates.splice(index, 1);
+                e.target.classList.remove('selected');
+            }
+
+            updateSelectedDatesList();
+        }
+
+        // Update the list of selected dates
+        function updateSelectedDatesList() {
+            const datesList = document.getElementById('datesList');
+            const noDatesMsg = document.getElementById('noDatesSelected');
+
+            if (selectedDates.length === 0) {
+                noDatesMsg.style.display = 'block';
+                datesList.innerHTML = '';
+                return;
+            }
+
+            noDatesMsg.style.display = 'none';
+            datesList.innerHTML = '';
+
+            // Sort dates chronologically
+            selectedDates.sort().forEach(date => {
+                const dateChip = document.createElement('span');
+                dateChip.className = 'date-chip';
+                // Format date nicely
+                const formattedDate = new Date(date).toLocaleDateString('default', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                dateChip.textContent = formattedDate;
+                datesList.appendChild(dateChip);
+            });
+        }
+
+        // Submit user's dates
+        async function submitUserDates() {
+            const userName = document.getElementById('userName').value.trim();
+
+            if (!userName) {
+                alert('Please enter your name');
+                return;
+            }
+
+            if (selectedDates.length === 0) {
+                alert('Please select at least one date');
+                return;
+            }
+
+            try {
+                const response = await fetch('/poll/user-dates', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userName,
+                        dates: selectedDates
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Your availability has been submitted! Time to plan that Space Needle visit!');
+                    // Clear selection
+                    selectedDates = [];
+                    document.querySelectorAll('.calendar-day.selected').forEach(day => {
+                        day.classList.remove('selected');
+                    });
+                    updateSelectedDatesList();
+                    document.getElementById('userName').value = '';
+                } else {
+                    alert('Error submitting your availability');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Error submitting your availability');
+            }
+        }
+
+        // Initialize the app
+        function init() {
+            initCalendar();
+            fetchAndRenderPoll();
+
+            // Set up delete user button
+            document.getElementById('deleteUserBtn').addEventListener('click', deleteUserDates);
+        }
+
+        // Delete a user's dates
+        async function deleteUserDates() {
+            const userName = document.getElementById('deleteUserName').value.trim();
+
+            if (!userName) {
+                alert('Please enter your name');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to remove all dates for ${userName}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/poll/user-dates/${encodeURIComponent(userName)}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Your dates have been removed successfully!');
+                    document.getElementById('deleteUserName').value = '';
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Error removing your dates');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Error removing your dates');
+            }
+        }
+
+        // Delete a specific user vote from the UI and server
+        async function deleteVote(userName) {
+            if (confirm(`Are you sure you want to remove all dates for ${userName}?`)) {
+                try {
+                    const response = await fetch(`/poll/user-dates/${encodeURIComponent(userName)}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        alert(data.error || 'Error removing dates');
+                    }
+                } catch (err) {
+                    console.error('Error:', err);
+                    alert('Error removing dates');
+                }
+            }
+        }
+
+        // Fetch and render poll results
+        async function fetchAndRenderPoll() {
+            try {
+                const resp = await fetch('/poll');
+                const pollData = await resp.json();
+
+                const resultsContainer = document.getElementById('pollResults');
+                resultsContainer.innerHTML = '';
+
+                if (pollData.userVotes && pollData.userVotes.length > 0) {
+                    pollData.userVotes.forEach(vote => {
+                        const voteEl = document.createElement('div');
+                        voteEl.className = 'user-vote';
+
+                        const nameEl = document.createElement('div');
+                        nameEl.innerHTML = `<strong>${vote.userName}</strong> is ready to explore Seattle on:`;
+                        voteEl.appendChild(nameEl);
+
+                        // Add delete button
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'delete-vote';
+                        deleteBtn.innerHTML = '×';
+                        deleteBtn.title = `Remove ${vote.userName}'s dates`;
+                        deleteBtn.onclick = () => deleteVote(vote.userName);
+                        voteEl.appendChild(deleteBtn);
+
+                        const datesContainer = document.createElement('div');
+                        vote.dates.sort().forEach(date => {
+                            const dateChip = document.createElement('span');
+                            dateChip.className = 'date-chip';
+                            // Format date
+                            const formattedDate = new Date(date).toLocaleDateString('default', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric'
+                            });
+                            dateChip.textContent = formattedDate;
+                            datesContainer.appendChild(dateChip);
+                        });
+                        voteEl.appendChild(datesContainer);
+                        resultsContainer.appendChild(voteEl);
+                    });
+
+                    // Add a summary section showing most popular dates
+                    if (pollData.popularDates && pollData.popularDates.length > 0) {
+                        const summaryEl = document.createElement('div');
+                        summaryEl.innerHTML = `<h3>Best Days for Our Seattle Adventure:</h3>`;
+
+                        const popularList = document.createElement('div');
+                        pollData.popularDates.forEach(item => {
+                            const dateRow = document.createElement('div');
+                            dateRow.className = 'popular-date';
+
+                            const dateEl = document.createElement('div');
+                            const formattedDate = new Date(item.date).toLocaleDateString('default', {
+                                weekday: 'long',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+
+                            // Add special events for dates in April
+                            let specialEvent = '';
+                            const day = new Date(item.date).getDate();
+                            if (new Date(item.date).getMonth() === 3) { // April
+                                if (day === 5) {
+                                    specialEvent = ' - Cherry Blossom Festival!';
+                                } else if (day === 12) {
+                                    specialEvent = ' - Tulip Festival nearby';
+                                } else if (day === 19) {
+                                    specialEvent = ' - Earth Day celebrations';
+                                } else if (day === 22) {
+                                    specialEvent = ' - Earth Day';
+                                } else if (day === 26) {
+                                    specialEvent = ' - Moisture Festival';
+                                }
+                            }
+
+                            dateEl.innerHTML = `<strong>${formattedDate}</strong>${specialEvent}`;
+                            dateRow.appendChild(dateEl);
+
+                            const countEl = document.createElement('div');
+                            countEl.className = 'count';
+                            countEl.textContent = `${item.count} ${item.count === 1 ? 'person' : 'people'}`;
+                            dateRow.appendChild(countEl);
+
+                            popularList.appendChild(dateRow);
+                        });
+
+                        summaryEl.appendChild(popularList);
+                        resultsContainer.appendChild(summaryEl);
+                    }
+                } else {
+                    resultsContainer.innerHTML = '<p>No availability submitted yet. Be the first to share when you can visit the Emerald City!</p>';
+                }
+            } catch (err) {
+                console.error('Error fetching poll data:', err);
+            }
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+
+</html>
